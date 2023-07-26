@@ -14,6 +14,20 @@ import sensor_msgs.point_cloud2 as pcl2
 from sensor_msgs.msg import PointField
 from erasor.msg import node
 
+import argparse
+
+def process_parameters():
+    parser = argparse.ArgumentParser(description='Convert own data to erasor-type data')
+    parser.add_argument('--lidar_topic', type=str, default="/rslidar_points", help='lidar_topic')
+    parser.add_argument('--world_frame', type=str, default="world", help='world_frame')
+    parser.add_argument('--lidar_frame', type=str, default="lidar", help='lidar_frame')
+    
+    args = parser.parse_args()
+    print(f"lidar_topic: {args.lidar_topic}")
+    print(f"world_frame: {args.world_frame}")
+    print(f"lidar_frame: {args.lidar_frame}")
+    return args
+
 def filter_nan_points(point_cloud):
     # 创建一个新的点云消息
     filtered_points = PointCloud2()
@@ -40,13 +54,19 @@ def filter_nan_points(point_cloud):
     return filtered_points
 
 class PointCloudSubscriber(object):
-    def __init__(self) -> None:
+
+    def __init__(self,args) -> None:
+        self.bag = rosbag.Bag(os.path.join("/media/mapping/YZH2/bag/ERASOR/", "own_data_to_erasor_data.bag"),'w', compression=rosbag.Compression.NONE)
+        self.listener = tf.TransformListener()
+        self.lidar_topic = args.lidar_topic
+        self.world_frame = args.world_frame
+        self.lidar_frame = args.lidar_frame
         self.sub = rospy.Subscriber("/rslidar_points",
                                      PointCloud2,
                                      self.callback, queue_size=5)
-        self.bag = rosbag.Bag(os.path.join("/media/mapping/YZH2/bag/ERASOR/", "own_data_to_erasor_data.bag"),'w', compression=rosbag.Compression.NONE)
-        self.listener = tf.TransformListener()
-
+        print(f"lidar_topic: {self.lidar_topic}")
+        print(f"world_frame: {self.world_frame}")
+        print(f"lidar_frame: {self.lidar_frame}")
 
     def callback(self, msg):
         assert isinstance(msg, PointCloud2)
@@ -113,5 +133,6 @@ class PointCloudSubscriber(object):
         
 if __name__ =='__main__':
     rospy.init_node("pointcloud_subscriber")
-    PointCloudSubscriber()
+    args = process_parameters()
+    PointCloudSubscriber(args)
     rospy.spin()
