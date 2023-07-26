@@ -5,6 +5,7 @@ vscode/*
 .idea/
 vscode/
 ./vscode/
+./vscode
 
 .codes/*
 .code/*
