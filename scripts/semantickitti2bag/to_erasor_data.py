@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 import rospy
-import tf2_ros
 import rosbag
 import os
 import tf
 import numpy as np
 from sensor_msgs.msg import PointCloud2
-from geometry_msgs.msg import TransformStamped, TwistStamped, Transform, Pose
+from geometry_msgs.msg import TransformStamped, Transform, Pose
 from tf2_msgs.msg import TFMessage
 from std_msgs.msg import Header
 import sensor_msgs.point_cloud2 as pcl2
@@ -23,9 +22,6 @@ def process_parameters():
     parser.add_argument('--lidar_frame', type=str, default="lidar", help='lidar_frame')
     
     args = parser.parse_args()
-    print(f"lidar_topic: {args.lidar_topic}")
-    print(f"world_frame: {args.world_frame}")
-    print(f"lidar_frame: {args.lidar_frame}")
     return args
 
 def filter_nan_points(point_cloud):
